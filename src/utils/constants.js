@@ -52,5 +52,26 @@ const CARDS = {
   QC: "QC",
   AC: "AC",
 };
-
+export const GAME_MODES = {
+  MVSM: "Computador vs Computador",
+  MVSH: "Computador vs Humano",
+};
 export const CARD_LIST = Object.keys(CARDS);
+
+export const PHASE = {
+  PreFlop: "PRE-FLOP",
+  Flop: "FLOP",
+  Turn: "TURN",
+  River: "RIVER",
+  End: "END",
+};
+export const PHASE_LIST = Object.keys(PHASE);
+export const STRAGEGIES = { LIE: "LIE", THINK: "THINK" };
+
+export const ACTIONS = {
+  CALL: "CALL",
+  FOLD: "FOLD",
+  RAISE: "RAISE",
+  BET: "BET",
+  CHECK: "CHECK",
+};
