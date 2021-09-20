@@ -32,13 +32,20 @@ const usePlayer = ({ showCards }) => {
       availableMoney: prev.availableMoney - money,
     }));
   };
-  const setStrategy = (q) => {
+  const setStrategy = (q, strategy) => {
+    if (strategy) setPlayer((prev) => ({ ...prev, strategy: strategy }));
+
     const rand = Math.random();
-    if (rand < q) {
-      setPlayer((prev) => ({ ...prev, strategy: STRAGEGIES.THINK }));
+    let chosenStr;
+    if (strategy) {
+      chosenStr = strategy;
+    } else if (rand < q) {
+      chosenStr = STRAGEGIES.THINK;
     } else {
-      setPlayer((prev) => ({ ...prev, strategy: STRAGEGIES.LIE }));
+      chosenStr = STRAGEGIES.LIE;
     }
+    setPlayer((prev) => ({ ...prev, strategy: chosenStr }));
+    return chosenStr;
   };
 
   const raise = (game) => {

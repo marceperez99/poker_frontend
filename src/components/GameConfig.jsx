@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Container, Form, Row, Col, InputGroup } from "react-bootstrap";
-import { CARD_LIST, GAME_MODES } from "../utils/constants";
+import { CARD_LIST, GAME_MODES, STRAGEGIES } from "../utils/constants";
 import { shuffle_array } from "../utils/utils";
 
 const GameConfig = ({ game, player1, player2 }) => {
@@ -114,10 +114,19 @@ const GameConfig = ({ game, player1, player2 }) => {
             }
             onClick={() => {
               player1.isComputer();
-              player1.setStrategy(config.computerQ1);
+              const strategy = player1.setStrategy(config.computerQ1);
               if (config.gameMode === GAME_MODES.MVSM) {
                 player2.isComputer();
-                player2.setStrategy(config.computerQ2);
+                if (strategy) {
+                  player2.setStrategy(
+                    config.computerQ2,
+                    strategy === STRAGEGIES.LIE
+                      ? STRAGEGIES.THINK
+                      : STRAGEGIES.LIE
+                  );
+                } else {
+                  player2.setStrategy(config.computerQ2);
+                }
               } else {
                 player2.isHuman();
               }
