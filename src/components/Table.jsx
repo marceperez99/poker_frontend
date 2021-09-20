@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import { CARD_LIST, PHASE_LIST } from "../utils/constants";
-import { shuffle_array } from "../utils/utils";
 import Card from "./Card";
 import Player from "./Player";
 
@@ -14,7 +12,7 @@ const Table = ({ game, player1, player2, turn, dealer, tableCards }) => {
           Fase: {game.state.phase}
         </Col>
         <Col sm={6} className="h4 text-light text-right">
-          Pozo: {game.state.shownPot} $
+          Pozo: {game.state.shownPot}
         </Col>
 
         <Col sm={12} className="d-flex justify-content-center my-4">
@@ -33,6 +31,7 @@ const Table = ({ game, player1, player2, turn, dealer, tableCards }) => {
             hasTurn={turn === 0}
             isDealer={dealer === 0}
             clearLastAction={player1.clearLastAction}
+            ongoingGame={game.state.ongoingGame}
           />
         </Col>
         <Col sm={6}>
@@ -48,9 +47,10 @@ const Table = ({ game, player1, player2, turn, dealer, tableCards }) => {
               if (player2.play(game, decision)) {
                 game.finishTurn(player1, player2);
               } else {
-                game.finishGame();
+                game.finishGame(player1, player2, "p2");
               }
             }}
+            ongoingGame={game.state.ongoingGame}
           />
         </Col>
       </Row>

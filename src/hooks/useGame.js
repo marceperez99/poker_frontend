@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getWinner } from "../api/api";
 import { ACTIONS, PHASE } from "../utils/constants";
 import stateGraph from "../utils/stateGraph";
 const INIT_STATE = {
@@ -18,10 +19,10 @@ const useGame = () => {
   const startGame = () =>
     setGameState((prev) => ({ ...prev, ongoingGame: true }));
   const initGame = (smallBlind, initialChips, bet, pot, tableCards) => {
-    const buttonPos = 0;
-    // state.dealer === undefined
-    //? Math.floor(Math.random() * 2)
-    //: (state.dealer + 1) % 2;
+    const buttonPos =
+      state.dealer === undefined
+        ? Math.floor(Math.random() * 2)
+        : (state.dealer + 1) % 2;
 
     setGameState((prev) => {
       return {
@@ -39,17 +40,55 @@ const useGame = () => {
         turnPassed: false,
         initialChips,
         tableCards,
+        checkedWinner: false,
       };
     });
     return buttonPos;
   };
 
-  const finishGame = () => {
-    setGameState((prev) => ({ ...prev, ongoingGame: false, currState: "O9" }));
+  const finishGame = (p1, p2, foldedBy = undefined) => {
+    p1.clearBet();
+    p2.clearBet();
+    setGameState((prev) => {
+      if (foldedBy === "p1") {
+        p2.setIsWinner(prev.pot);
+      } else if (foldedBy === "p2") {
+        p1.setIsWinner(prev.pot);
+      } else {
+        getWinner(
+          p1.player.cards.map((c) => c.card),
+          p2.player.cards.map((c) => c.card),
+          prev.tableCards.map((c) => c.card)
+        ).then((winner) => {
+          console.log(winner);
+          switch (winner) {
+            case 0:
+              p1.setIsWinner(prev.pot / 2);
+              p2.setIsWinner(prev.pot / 2);
+              break;
+            case 1:
+              p1.setIsWinner(prev.pot);
+              break;
+            case 2:
+              p2.setIsWinner(prev.pot);
+              break;
+          }
+        });
+      }
+      return {
+        ...prev,
+        ongoingGame: false,
+        pot: 0,
+        currState: "O9",
+        shownPot: 0,
+        checkedWinner: true,
+      };
+    });
   };
   const finishTurn = (player1, player2) =>
     setGameState((prev) => {
-      const currPhase = stateGraph[prev.currState].phase;
+      console.log(prev.currState, stateGraph[prev.currState]);
+      const currPhase = stateGraph[prev.currState]?.phase;
       if (prev.turnPassed) {
         prev.turnPassed = false;
         prev.shownPot = prev.pot;
@@ -77,7 +116,7 @@ const useGame = () => {
     });
 
   const hasFinished = () => {
-    return state.phase === 4;
+    return state.phase === PHASE.End;
   };
   const setTableCards = (cards) =>
     setGameState((prev) => ({ ...prev, tableCards: cards }));
@@ -97,7 +136,7 @@ const useGame = () => {
     setGameState((prev) => {
       const currState = stateGraph[prev.currState]?.actions[option];
       let turnPassed =
-        stateGraph[prev.currState].phase !== stateGraph[currState]?.phase;
+        stateGraph[prev.currState]?.phase !== stateGraph[currState]?.phase;
 
       return {
         ...prev,
@@ -116,6 +155,15 @@ const useGame = () => {
       ...prev,
       pot: prev.pot + amount,
     }));
+
+  const checkWinner = async (player1, player2) => {
+    if (
+      stateGraph[state.currState]?.phase === PHASE.End &&
+      !state.checkedWinner
+    ) {
+      finishGame(player1, player2);
+    }
+  };
   return {
     state,
     startGame,
@@ -129,6 +177,7 @@ const useGame = () => {
     addBet,
     addToPot,
     initGame,
+    checkWinner,
   };
 };
 

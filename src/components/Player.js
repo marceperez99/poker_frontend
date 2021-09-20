@@ -8,23 +8,13 @@ const Player = ({
   isDealer,
   options,
   onSelectOption,
-  clearLastAction,
+  ongoingGame,
 }) => {
-  const [lastAction, setLastAction] = useState(undefined);
-  useEffect(() => {
-    if (player.lastAction && !lastAction && clearLastAction) {
-      setLastAction(player.lastAction);
-      clearLastAction();
-      setTimeout(() => {
-        setLastAction(undefined);
-      }, 2000);
-    }
-  }, [player.lastAction, lastAction]);
   return (
     <Container>
       <Row>
         <Col sm={12} className="text-center" style={{ height: "40px" }}>
-          {hasTurn && (
+          {hasTurn && ongoingGame && (
             <h5>
               <Badge>Turno</Badge>
             </h5>
@@ -66,9 +56,9 @@ const Player = ({
             </Badge>
           </h6>
         </Col>
-        {lastAction && (
+        {player.lastAction && !player.isHuman && (
           <Col>
-            <h6 className="text-center text-light">{lastAction}</h6>
+            <h6 className="text-center text-light">{player.lastAction}</h6>
           </Col>
         )}
         {player.isHuman && hasTurn && (

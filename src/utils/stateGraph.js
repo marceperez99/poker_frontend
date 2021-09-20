@@ -115,5 +115,6 @@ export default {
   },
   O9: {
     phase: PHASE.End,
+    actions: {},
   },
 };

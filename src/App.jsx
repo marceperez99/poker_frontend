@@ -14,34 +14,39 @@ function App() {
   const game = useGame();
   // player 1
   const player1 = usePlayer({});
+
   // player 2
   const player2 = usePlayer({ showCards: true });
 
   useEffect(() => {
-    if (game.hasFinished()) {
-      game.finishGame();
+    if (!game.state.ongoingGame) {
       return;
     }
     (async () => {
       const turn = game.state.turn;
       if (!game.state.ongoingGame) return;
       if (turn === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         if (await player1.playAutomatically(game)) {
           game.finishTurn(player1, player2);
         } else {
-          game.finishGame();
+          game.finishGame(player1, player2, "p1");
         }
       } else {
         if (!player2.player.isHuman) {
           await new Promise((resolve) => setTimeout(resolve, 2000));
-
-          await player2.playAutomatically(game);
-          game.finishTurn(player1, player2);
+          if (await player2.playAutomatically(game)) {
+            game.finishTurn(player1, player2);
+          } else {
+            game.finishGame(player1, player2, "p2");
+          }
         }
       }
     })();
   }, [game.state.turn]);
-
+  useEffect(() => {
+    game.checkWinner(player1, player2);
+  }, [game.state]);
   return (
     <>
       <NavBar />

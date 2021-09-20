@@ -122,7 +122,9 @@ const GameConfig = ({ game, player1, player2 }) => {
                 player2.isHuman();
               }
               player1.setMoney(config.initialMoney);
+              player1.setIsWinner(0, false);
               player2.setMoney(config.initialMoney);
+              player1.setIsWinner(0, false);
 
               const cards = shuffle_array([...CARD_LIST]);
               player1.setHand(cards.slice(0, 2));

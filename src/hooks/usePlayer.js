@@ -18,8 +18,9 @@ const usePlayer = ({ showCards }) => {
       ...prev,
       cards: hand.map((card) => ({ card, shown: !!showCards })),
     }));
-  const setMoney = (money) =>
+  const setMoney = (money) => {
     setPlayer((prev) => ({ ...prev, availableMoney: money }));
+  };
   const isComputer = () =>
     setPlayer((prev) => ({ ...prev, isHuman: false, name: "Computadora" }));
   const isHuman = () =>
@@ -46,13 +47,15 @@ const usePlayer = ({ showCards }) => {
       ([PHASE.Turn, PHASE.River].includes(game.state.phase) ? 2 : 1);
 
     const newBet = game.state.bet + betLimit;
+    setPlayer((prev) => {
+      game.addToPot(newBet - prev.bet);
+      return {
+        ...prev,
+        availableMoney: prev.availableMoney - newBet + prev.bet,
+        bet: newBet,
+      };
+    });
 
-    setPlayer((prev) => ({
-      ...prev,
-      availableMoney: prev.availableMoney - newBet + prev.bet,
-      bet: newBet,
-    }));
-    game.addToPot(newBet);
     game.raiseBet(newBet);
   };
   const call = (game) => {
@@ -64,15 +67,16 @@ const usePlayer = ({ showCards }) => {
     }));
     game.addToPot(newBet);
   };
-  const fold = (game) => {
-    game.finishGame();
-  };
+
   const play = (game, decision) => {
     game.advance(decision);
     setPlayer((prev) => ({ ...prev, lastAction: decision }));
+    setTimeout(
+      () => setPlayer((prev) => ({ ...prev, lastAction: undefined })),
+      2000
+    );
     switch (decision) {
       case ACTIONS.FOLD:
-        fold(game);
         return false;
       case ACTIONS.CHECK:
       case ACTIONS.CALL:
@@ -97,15 +101,29 @@ const usePlayer = ({ showCards }) => {
       game.state.initialChips,
       player.availableMoney
     );
-    console.log("Computer decide do ", decision, " bip bop");
     return play(game, decision);
   };
   const setIsDealer = () => setPlayer((prev) => ({ ...prev, isDealer: true }));
-
   const clearLastAction = () =>
     setPlayer((prev) => ({ ...prev, lastAction: undefined }));
-
   const clearBet = () => setPlayer((prev) => ({ ...prev, bet: 0 }));
+  const setIsWinner = async (money, isWinner = true) => {
+    setPlayer((prev) => {
+      return {
+        ...prev,
+        isWinner,
+        bet: 0,
+        availableMoney: prev.availableMoney + money,
+      };
+    });
+  };
+  const addMoney = (money) => {
+    setPlayer((prev) => ({
+      ...prev,
+      availableMoney: prev.availableMoney + money,
+    }));
+  };
+
   return {
     player,
     setHand,
@@ -119,6 +137,8 @@ const usePlayer = ({ showCards }) => {
     setIsDealer,
     clearLastAction,
     clearBet,
+    setIsWinner,
+    addMoney,
   };
 };
 export default usePlayer;
