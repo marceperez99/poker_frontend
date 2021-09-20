@@ -35,9 +35,9 @@ const usePlayer = ({ showCards }) => {
   const setStrategy = (q) => {
     const rand = Math.random();
     if (rand < q) {
-      setPlayer((prev) => ({ ...prev, strategy: STRAGEGIES.LIE }));
-    } else {
       setPlayer((prev) => ({ ...prev, strategy: STRAGEGIES.THINK }));
+    } else {
+      setPlayer((prev) => ({ ...prev, strategy: STRAGEGIES.LIE }));
     }
   };
 
