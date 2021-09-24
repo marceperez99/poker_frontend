@@ -130,6 +130,11 @@ const usePlayer = ({ showCards }) => {
       availableMoney: prev.availableMoney + money,
     }));
   };
+  const setShowCards = (show) =>
+    setPlayer((prev) => ({
+      ...prev,
+      cards: prev.cards.map((c) => ({ ...c, shown: show })),
+    }));
 
   return {
     player,
@@ -146,6 +151,7 @@ const usePlayer = ({ showCards }) => {
     clearBet,
     setIsWinner,
     addMoney,
+    setShowCards,
   };
 };
 export default usePlayer;

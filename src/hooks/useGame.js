@@ -48,7 +48,9 @@ const useGame = () => {
 
   const finishGame = (p1, p2, foldedBy = undefined) => {
     p1.clearBet();
+    p1.setShowCards(true);
     p2.clearBet();
+    p2.setShowCards(true);
     setGameState((prev) => {
       if (foldedBy === "p1") {
         p2.setIsWinner(prev.pot);
@@ -77,6 +79,7 @@ const useGame = () => {
       }
       return {
         ...prev,
+        tableCards: prev.tableCards.map((c) => ({ ...c, shown: true })),
         ongoingGame: false,
         pot: 0,
         currState: "O9",
@@ -164,6 +167,7 @@ const useGame = () => {
       finishGame(player1, player2);
     }
   };
+
   return {
     state,
     startGame,
